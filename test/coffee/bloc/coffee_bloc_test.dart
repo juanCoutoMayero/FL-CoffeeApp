@@ -3,12 +3,19 @@ import 'package:coffee_app/coffee/bloc/bloc.dart';
 import 'package:coffee_repository/coffee_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:monitoring_repository/monitoring_repository.dart';
 
 class MockCoffeeRepository extends Mock implements CoffeeRepository {}
+
+class MockAnalyticsService extends Mock implements AnalyticsService {}
+
+class MockCrashlyticsService extends Mock implements CrashlyticsService {}
 
 void main() {
   group('CoffeeBloc', () {
     late CoffeeRepository coffeeRepository;
+    late AnalyticsService analyticsService;
+    late CrashlyticsService crashlyticsService;
 
     setUpAll(() {
       registerFallbackValue(const Coffee(file: 'fallback'));
@@ -16,6 +23,15 @@ void main() {
 
     setUp(() {
       coffeeRepository = MockCoffeeRepository();
+      analyticsService = MockAnalyticsService();
+      crashlyticsService = MockCrashlyticsService();
+
+      when(
+        () => analyticsService.logEvent(name: any(named: 'name')),
+      ).thenAnswer((_) async {});
+      when(
+        () => crashlyticsService.recordError(any(), any()),
+      ).thenAnswer((_) async {});
       when(() => coffeeRepository.getFavorites()).thenReturn([]);
       when(
         () => coffeeRepository.getFavoritesStream(),
@@ -24,7 +40,11 @@ void main() {
 
     test('initial state is correct', () {
       expect(
-        CoffeeBloc(coffeeRepository: coffeeRepository).state,
+        CoffeeBloc(
+          coffeeRepository: coffeeRepository,
+          analyticsService: analyticsService,
+          crashlyticsService: crashlyticsService,
+        ).state,
         const CoffeeState(),
       );
     });
@@ -34,7 +54,11 @@ void main() {
         const Coffee(file: 'url'),
       ]);
       expect(
-        CoffeeBloc(coffeeRepository: coffeeRepository).state,
+        CoffeeBloc(
+          coffeeRepository: coffeeRepository,
+          analyticsService: analyticsService,
+          crashlyticsService: crashlyticsService,
+        ).state,
         const CoffeeState(favorites: [Coffee(file: 'url')]),
       );
     });
@@ -47,7 +71,11 @@ void main() {
         ).thenAnswer((_) async => const Coffee(file: 'url'));
         when(() => coffeeRepository.isFavorite(any())).thenReturn(false);
       },
-      build: () => CoffeeBloc(coffeeRepository: coffeeRepository),
+      build: () => CoffeeBloc(
+        coffeeRepository: coffeeRepository,
+        analyticsService: analyticsService,
+        crashlyticsService: crashlyticsService,
+      ),
       act: (bloc) => bloc.add(const CoffeeFetchRequested()),
       expect: () => [
         const CoffeeState(status: CoffeeStatus.loading),
@@ -67,7 +95,11 @@ void main() {
         ).thenAnswer((_) async => const Coffee(file: 'url'));
         when(() => coffeeRepository.isFavorite(any())).thenReturn(true);
       },
-      build: () => CoffeeBloc(coffeeRepository: coffeeRepository),
+      build: () => CoffeeBloc(
+        coffeeRepository: coffeeRepository,
+        analyticsService: analyticsService,
+        crashlyticsService: crashlyticsService,
+      ),
       act: (bloc) => bloc.add(const CoffeeFetchRequested()),
       expect: () => [
         const CoffeeState(status: CoffeeStatus.loading),
@@ -84,7 +116,11 @@ void main() {
       setUp: () {
         when(() => coffeeRepository.getRandomCoffee()).thenThrow(Exception());
       },
-      build: () => CoffeeBloc(coffeeRepository: coffeeRepository),
+      build: () => CoffeeBloc(
+        coffeeRepository: coffeeRepository,
+        analyticsService: analyticsService,
+        crashlyticsService: crashlyticsService,
+      ),
       act: (bloc) => bloc.add(const CoffeeFetchRequested()),
       expect: () => [
         const CoffeeState(status: CoffeeStatus.loading),
@@ -100,7 +136,11 @@ void main() {
           () => coffeeRepository.saveFavorite(any()),
         ).thenAnswer((_) async {});
       },
-      build: () => CoffeeBloc(coffeeRepository: coffeeRepository),
+      build: () => CoffeeBloc(
+        coffeeRepository: coffeeRepository,
+        analyticsService: analyticsService,
+        crashlyticsService: crashlyticsService,
+      ),
       act: (bloc) => bloc.add(const CoffeeFavoriteToggled(Coffee(file: 'url'))),
       expect: () => [
         const CoffeeState(
@@ -117,7 +157,11 @@ void main() {
 
     blocTest<CoffeeBloc, CoffeeState>(
       'resets saveStatus when CoffeeSaveStatusReset is added',
-      build: () => CoffeeBloc(coffeeRepository: coffeeRepository),
+      build: () => CoffeeBloc(
+        coffeeRepository: coffeeRepository,
+        analyticsService: analyticsService,
+        crashlyticsService: crashlyticsService,
+      ),
       seed: () => const CoffeeState(saveStatus: CoffeeRequestStatus.success),
       act: (bloc) => bloc.add(const CoffeeSaveStatusReset()),
       expect: () => [
@@ -133,7 +177,11 @@ void main() {
           () => coffeeRepository.removeFavorite(any()),
         ).thenAnswer((_) async {});
       },
-      build: () => CoffeeBloc(coffeeRepository: coffeeRepository),
+      build: () => CoffeeBloc(
+        coffeeRepository: coffeeRepository,
+        analyticsService: analyticsService,
+        crashlyticsService: crashlyticsService,
+      ),
       seed: () =>
           const CoffeeState(isFavorite: true), // Seed with initial state
       act: (bloc) => bloc.add(const CoffeeFavoriteToggled(Coffee(file: 'url'))),
@@ -155,7 +203,11 @@ void main() {
           (_) => Stream.value([const Coffee(file: 'url')]),
         );
       },
-      build: () => CoffeeBloc(coffeeRepository: coffeeRepository),
+      build: () => CoffeeBloc(
+        coffeeRepository: coffeeRepository,
+        analyticsService: analyticsService,
+        crashlyticsService: crashlyticsService,
+      ),
       expect: () => [
         const CoffeeState(favorites: [Coffee(file: 'url')]),
       ],
@@ -163,7 +215,11 @@ void main() {
 
     blocTest<CoffeeBloc, CoffeeState>(
       'emits [success] with selected coffee and isFavorite true when CoffeeSelected is added',
-      build: () => CoffeeBloc(coffeeRepository: coffeeRepository),
+      build: () => CoffeeBloc(
+        coffeeRepository: coffeeRepository,
+        analyticsService: analyticsService,
+        crashlyticsService: crashlyticsService,
+      ),
       act: (bloc) => bloc.add(const CoffeeSelected(Coffee(file: 'url'))),
       expect: () => [
         const CoffeeState(

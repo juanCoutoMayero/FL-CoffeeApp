@@ -10,6 +10,7 @@ import 'package:coffee_app/l10n/l10n.dart';
 import 'package:coffee_repository/coffee_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:monitoring_repository/monitoring_repository.dart';
 
 class CoffeePage extends StatelessWidget {
   const CoffeePage({super.key});
@@ -19,6 +20,8 @@ class CoffeePage extends StatelessWidget {
     return BlocProvider(
       create: (context) => CoffeeBloc(
         coffeeRepository: context.read<CoffeeRepository>(),
+        analyticsService: context.read<AnalyticsService>(),
+        crashlyticsService: context.read<CrashlyticsService>(),
       )..add(const CoffeeFetchRequested()),
       child: BlocListener<CoffeeBloc, CoffeeState>(
         listenWhen: (previous, current) =>
@@ -63,19 +66,19 @@ class CoffeeView extends StatelessWidget {
           ),
         ],
       ),
-      body: Center(
+      body: const Center(
         child: Column(
           children: [
-            const Spacer(),
-            const Padding(
+            Spacer(),
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: AppDimens.paddingLarge),
               child: CoffeeDisplay(),
             ),
-            const SizedBox(height: AppDimens.spacingMedium),
-            const CoffeeControls(),
-            const Spacer(),
-            const FavoritesList(),
-            const SizedBox(height: AppDimens.spacingMedium),
+            SizedBox(height: AppDimens.spacingMedium),
+            CoffeeControls(),
+            Spacer(),
+            FavoritesList(),
+            SizedBox(height: AppDimens.spacingMedium),
           ],
         ),
       ),

@@ -4,15 +4,21 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:coffee_app/coffee/bloc/coffee_event.dart';
 import 'package:coffee_app/coffee/bloc/coffee_state.dart';
 import 'package:coffee_repository/coffee_repository.dart';
+import 'package:monitoring_repository/monitoring_repository.dart';
 
 class CoffeeBloc extends Bloc<CoffeeEvent, CoffeeState> {
-  CoffeeBloc({required CoffeeRepository coffeeRepository})
-    : _coffeeRepository = coffeeRepository,
-      super(
-        CoffeeState(
-          favorites: coffeeRepository.getFavorites(),
-        ),
-      ) {
+  CoffeeBloc({
+    required CoffeeRepository coffeeRepository,
+    required AnalyticsService analyticsService,
+    required CrashlyticsService crashlyticsService,
+  }) : _coffeeRepository = coffeeRepository,
+       _analyticsService = analyticsService,
+       _crashlyticsService = crashlyticsService,
+       super(
+         CoffeeState(
+           favorites: coffeeRepository.getFavorites(),
+         ),
+       ) {
     on<CoffeeFetchRequested>(_onFetchRequested, transformer: droppable());
     on<CoffeeFavoriteToggled>(_onFavoriteToggled);
     on<CoffeeFavoritesSubscriptionRequested>(_onFavoritesSubscriptionRequested);
@@ -23,6 +29,8 @@ class CoffeeBloc extends Bloc<CoffeeEvent, CoffeeState> {
   }
 
   final CoffeeRepository _coffeeRepository;
+  final AnalyticsService _analyticsService;
+  final CrashlyticsService _crashlyticsService;
 
   void _onCoffeeSelected(
     CoffeeSelected event,
@@ -69,8 +77,10 @@ class CoffeeBloc extends Bloc<CoffeeEvent, CoffeeState> {
           isFavorite: isFavorite,
         ),
       );
-    } catch (_) {
+      await _analyticsService.logEvent(name: 'request_new_coffee');
+    } catch (error, stackTrace) {
       emit(state.copyWith(status: CoffeeStatus.failure));
+      await _crashlyticsService.recordError(error, stackTrace);
     }
   }
 
@@ -83,6 +93,7 @@ class CoffeeBloc extends Bloc<CoffeeEvent, CoffeeState> {
       if (isFav) {
         await _coffeeRepository.removeFavorite(event.coffee);
         emit(state.copyWith(isFavorite: false));
+        await _analyticsService.logEvent(name: 'remove_favorite');
       } else {
         await _coffeeRepository.saveFavorite(event.coffee);
         emit(
@@ -91,9 +102,11 @@ class CoffeeBloc extends Bloc<CoffeeEvent, CoffeeState> {
             saveStatus: CoffeeRequestStatus.success,
           ),
         );
+        await _analyticsService.logEvent(name: 'add_favorite');
       }
-    } catch (_) {
+    } catch (error, stackTrace) {
       // Handle error saving favorite
+      await _crashlyticsService.recordError(error, stackTrace);
     }
   }
 }
