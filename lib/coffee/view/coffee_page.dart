@@ -1,3 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:coffee_app/app/cubit/theme_cubit.dart';
 import 'package:coffee_app/app/theme/app_dimens.dart';
 import 'package:coffee_app/coffee/bloc/bloc.dart';
 import 'package:coffee_app/coffee/widgets/coffee_controls.dart';
@@ -45,7 +47,21 @@ class CoffeeView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.coffeeAppBarTitle),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+
+        actions: [
+          BlocBuilder<ThemeCubit, ThemeMode>(
+            builder: (context, themeMode) {
+              return IconButton(
+                icon: Icon(
+                  themeMode == ThemeMode.dark
+                      ? Icons.light_mode
+                      : Icons.dark_mode,
+                ),
+                onPressed: () => context.read<ThemeCubit>().toggleTheme(),
+              );
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Column(
@@ -73,6 +89,9 @@ class CoffeeDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CoffeeBloc, CoffeeState>(
+      buildWhen: (previous, current) =>
+          previous.status != current.status ||
+          previous.coffee != current.coffee,
       builder: (context, state) {
         if (state.status == CoffeeStatus.loading) {
           return CustomShimmer(
@@ -87,16 +106,32 @@ class CoffeeDisplay extends StatelessWidget {
           );
         } else if (state.status == CoffeeStatus.success &&
             state.coffee != null) {
-          return Container(
-            constraints: const BoxConstraints(
-              maxHeight: AppDimens.coffeeImageHeight,
-            ),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(AppDimens.paddingLarge),
-              image: DecorationImage(
-                image: NetworkImage(state.coffee!.file),
-                fit: BoxFit.cover,
+          return CachedNetworkImage(
+            imageUrl: state.coffee!.file,
+            imageBuilder: (context, imageProvider) => Container(
+              constraints: const BoxConstraints(
+                maxHeight: AppDimens.coffeeImageHeight,
               ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(AppDimens.paddingLarge),
+                image: DecorationImage(
+                  image: imageProvider,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            placeholder: (context, url) => CustomShimmer(
+              child: Container(
+                height: AppDimens.coffeeImageHeight,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(AppDimens.paddingLarge),
+                ),
+              ),
+            ),
+            errorWidget: (context, url, error) => Center(
+              child: Text(context.l10n.somethingWentWrong),
             ),
           );
         } else if (state.status == CoffeeStatus.failure) {

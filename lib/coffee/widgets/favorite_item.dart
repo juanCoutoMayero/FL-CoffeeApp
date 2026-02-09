@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:coffee_app/app/theme/app_dimens.dart';
 import 'package:coffee_app/coffee/bloc/bloc.dart';
 import 'package:coffee_repository/coffee_repository.dart';
@@ -27,7 +28,7 @@ class FavoriteItem extends StatelessWidget {
             image: DecorationImage(
               image: coffee.isLocal
                   ? FileImage(File(coffee.localPath!)) as ImageProvider
-                  : NetworkImage(coffee.file),
+                  : CachedNetworkImageProvider(coffee.file),
               fit: BoxFit.cover,
             ),
           ),
