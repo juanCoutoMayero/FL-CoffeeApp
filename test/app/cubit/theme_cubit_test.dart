@@ -6,30 +6,28 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('ThemeCubit', () {
     test('initial state is ThemeMode.system', () {
-      expect(ThemeCubit().state, ThemeMode.system);
+      expect(ThemeCubit().state, equals(ThemeMode.system));
     });
 
     blocTest<ThemeCubit, ThemeMode>(
-      'emits [ThemeMode.dark] when toggleTheme is called and current state is system',
-      build: () => ThemeCubit(),
+      'emits [ThemeMode.light] when toggleTheme is called and state is dark',
+      build: () => ThemeCubit()..emit(ThemeMode.dark),
       act: (cubit) => cubit.toggleTheme(),
-      expect: () => const <ThemeMode>[ThemeMode.dark],
+      expect: () => [ThemeMode.light],
     );
 
     blocTest<ThemeCubit, ThemeMode>(
-      'emits [ThemeMode.light] when toggleTheme is called and current state is dark',
-      build: () => ThemeCubit(),
-      seed: () => ThemeMode.dark,
+      'emits [ThemeMode.dark] when toggleTheme is called and state is light',
+      build: () => ThemeCubit()..emit(ThemeMode.light),
       act: (cubit) => cubit.toggleTheme(),
-      expect: () => const <ThemeMode>[ThemeMode.light],
+      expect: () => [ThemeMode.dark],
     );
 
     blocTest<ThemeCubit, ThemeMode>(
-      'emits [ThemeMode.dark] when toggleTheme is called and current state is light',
+      'emits [ThemeMode.dark] when toggleTheme is called and state is system',
       build: () => ThemeCubit(),
-      seed: () => ThemeMode.light,
       act: (cubit) => cubit.toggleTheme(),
-      expect: () => const <ThemeMode>[ThemeMode.dark],
+      expect: () => [ThemeMode.dark],
     );
   });
 }

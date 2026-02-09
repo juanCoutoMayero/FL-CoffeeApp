@@ -13,6 +13,10 @@ void main() {
     late Box<CoffeeModel> coffeeBox;
     late CoffeeLocalDataSource localDataSource;
 
+    setUpAll(() {
+      registerFallbackValue('fallback');
+    });
+
     setUp(() {
       coffeeBox = MockCoffeeBox();
       localDataSource = CoffeeLocalDataSource(coffeeBox: coffeeBox);
@@ -95,7 +99,7 @@ void main() {
           localPath: file.path,
         );
 
-        when(() => coffeeBox.delete(any())).thenAnswer((_) async {});
+        when(() => coffeeBox.delete('image.jpg')).thenAnswer((_) async {});
 
         await localDataSource.removeFavorite(coffee);
 

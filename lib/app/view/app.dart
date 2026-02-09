@@ -2,6 +2,7 @@ import 'package:coffee_app/app/cubit/theme_cubit.dart';
 import 'package:coffee_app/coffee/view/coffee_page.dart';
 import 'package:coffee_app/l10n/l10n.dart';
 import 'package:flutter/material.dart';
+import 'package:monitoring_repository/monitoring_repository.dart';
 
 import 'package:coffee_repository/coffee_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,15 +10,23 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class App extends StatelessWidget {
   const App({
     required this.coffeeRepository,
+    required this.analyticsService,
+    required this.crashlyticsService,
     super.key,
   });
 
   final CoffeeRepository coffeeRepository;
+  final AnalyticsService analyticsService;
+  final CrashlyticsService crashlyticsService;
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider.value(
-      value: coffeeRepository,
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider.value(value: coffeeRepository),
+        RepositoryProvider.value(value: analyticsService),
+        RepositoryProvider.value(value: crashlyticsService),
+      ],
       child: BlocProvider(
         create: (_) => ThemeCubit(),
         child: const AppView(),
