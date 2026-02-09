@@ -3,5 +3,29 @@
     "counterAppBarTitle": "Counter",
     "@counterAppBarTitle": {
         "description": "Text shown in the AppBar of the Counter Page"
+    },
+    "coffeeAppBarTitle": "CoffeeApp",
+    "@coffeeAppBarTitle": {
+        "description": "Text shown in the AppBar of the Coffee Page"
+    },
+    "coffeeAnotherOneButton": "Another coffee, please",
+    "@coffeeAnotherOneButton": {
+        "description": "Button text to request another coffee"
+    },
+    "coffeeAddedToFavorites": "Added to favorites!",
+    "@coffeeAddedToFavorites": {
+        "description": "Message shown when adding to favorites"
+    },
+    "favoritesEmptyState": "Hey, you haven't saved any coffee yet. Don't be bitter, give it a like!",
+    "@favoritesEmptyState": {
+        "description": "Message shown when favorites list is empty"
+    },
+    "favoritesTitle": "My Favorite Coffees",
+    "@favoritesTitle": {
+        "description": "Title for the favorites section"
+    },
+    "coffeeSavedSuccessfullyMessage": "Coffee saved successfully!",
+    "@coffeeSavedSuccessfullyMessage": {
+        "description": "Message shown when coffee is saved successfully"
     }
 }

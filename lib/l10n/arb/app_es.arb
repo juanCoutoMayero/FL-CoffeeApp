@@ -3,5 +3,29 @@
     "counterAppBarTitle": "Contador",
     "@counterAppBarTitle": {
         "description": "Texto mostrado en la AppBar de la página del contador"
+    },
+    "coffeeAppBarTitle": "CoffeeApp",
+    "@coffeeAppBarTitle": {
+        "description": "Texto mostrado en la AppBar de la página de café"
+    },
+    "coffeeAnotherOneButton": "Otro café, porfa",
+    "@coffeeAnotherOneButton": {
+        "description": "Texto del botón para pedir otro café"
+    },
+    "coffeeAddedToFavorites": "¡Agregado a favoritos!",
+    "@coffeeAddedToFavorites": {
+        "description": "Mensaje al agregar a favoritos"
+    },
+    "favoritesEmptyState": "Che, todavía no guardaste ningún café. ¡No seas amargo y dale al corazón!",
+    "@favoritesEmptyState": {
+        "description": "Mensaje mostrado cuando la lista de favoritos está vacía"
+    },
+    "favoritesTitle": "Mis Cafés Favoritos",
+    "@favoritesTitle": {
+        "description": "Título para la sección de favoritos"
+    },
+    "coffeeSavedSuccessfullyMessage": "¡Café guardado con éxito!",
+    "@coffeeSavedSuccessfullyMessage": {
+        "description": "Mensaje mostrado al guardar un café exitosamente"
     }
 }
