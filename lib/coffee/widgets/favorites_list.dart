@@ -1,6 +1,6 @@
-import 'dart:io';
-
+import 'package:coffee_app/app/theme/app_dimens.dart';
 import 'package:coffee_app/coffee/bloc/bloc.dart';
+import 'package:coffee_app/coffee/widgets/favorite_item.dart';
 import 'package:coffee_app/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,7 +16,7 @@ class FavoritesList extends StatelessWidget {
         if (state.favorites.isEmpty) {
           // Empty State
           return Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimens.paddingMedium),
             child: Text(
               context.l10n.favoritesEmptyState,
               textAlign: TextAlign.center,
@@ -31,7 +31,10 @@ class FavoritesList extends StatelessWidget {
         return Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimens.paddingMedium,
+                vertical: AppDimens.paddingSmall,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -43,35 +46,16 @@ class FavoritesList extends StatelessWidget {
               ),
             ),
             SizedBox(
-              height: 120,
+              height: AppDimens.favoritesListHeight,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimens.paddingMedium,
+                ),
                 itemCount: displayList.length,
                 itemBuilder: (context, index) {
                   final coffee = displayList[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: GestureDetector(
-                      onTap: () {
-                        context.read<CoffeeBloc>().add(CoffeeSelected(coffee));
-                      },
-                      child: Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          image: DecorationImage(
-                            image: coffee.isLocal
-                                ? FileImage(File(coffee.localPath!))
-                                      as ImageProvider
-                                : NetworkImage(coffee.file),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
+                  return FavoriteItem(coffee: coffee);
                 },
               ),
             ),

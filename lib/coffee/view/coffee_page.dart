@@ -1,5 +1,6 @@
+import 'package:coffee_app/app/theme/app_dimens.dart';
 import 'package:coffee_app/coffee/bloc/bloc.dart';
-import 'package:coffee_app/coffee/widgets/coffee_button.dart';
+import 'package:coffee_app/coffee/widgets/coffee_controls.dart';
 import 'package:coffee_app/coffee/widgets/custom_shimmer.dart';
 import 'package:coffee_app/coffee/widgets/favorites_list.dart';
 import 'package:coffee_app/l10n/l10n.dart';
@@ -51,49 +52,14 @@ class CoffeeView extends StatelessWidget {
           children: [
             const Spacer(),
             const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24),
+              padding: EdgeInsets.symmetric(horizontal: AppDimens.paddingLarge),
               child: CoffeeDisplay(),
             ),
-
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CoffeeButton(
-                  onPressed: () {
-                    context.read<CoffeeBloc>().add(
-                      const CoffeeFetchRequested(),
-                    );
-                  },
-                  child: Text(l10n.coffeeAnotherOneButton),
-                ),
-                const SizedBox(width: 16),
-                CoffeeButton(
-                  onPressed: () {
-                    final state = context.read<CoffeeBloc>().state;
-                    if (state.status == CoffeeStatus.success &&
-                        state.coffee != null) {
-                      context.read<CoffeeBloc>().add(
-                        CoffeeFavoriteToggled(state.coffee!),
-                      );
-                    }
-                  },
-                  child: BlocBuilder<CoffeeBloc, CoffeeState>(
-                    builder: (context, state) {
-                      return Icon(
-                        state.isFavorite
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color: state.isFavorite ? Colors.red : null,
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
+            const SizedBox(height: AppDimens.spacingMedium),
+            const CoffeeControls(),
             const Spacer(),
             const FavoritesList(),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimens.spacingMedium),
           ],
         ),
       ),
@@ -111,20 +77,22 @@ class CoffeeDisplay extends StatelessWidget {
         if (state.status == CoffeeStatus.loading) {
           return CustomShimmer(
             child: Container(
-              height: 400,
+              height: AppDimens.coffeeImageHeight,
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(AppDimens.paddingLarge),
               ),
             ),
           );
         } else if (state.status == CoffeeStatus.success &&
             state.coffee != null) {
           return Container(
-            constraints: const BoxConstraints(maxHeight: 400),
+            constraints: const BoxConstraints(
+              maxHeight: AppDimens.coffeeImageHeight,
+            ),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(AppDimens.paddingLarge),
               image: DecorationImage(
                 image: NetworkImage(state.coffee!.file),
                 fit: BoxFit.cover,
@@ -132,7 +100,7 @@ class CoffeeDisplay extends StatelessWidget {
             ),
           );
         } else if (state.status == CoffeeStatus.failure) {
-          return const Text('Something went wrong!');
+          return Text(context.l10n.somethingWentWrong);
         } else {
           return const SizedBox.shrink();
         }
