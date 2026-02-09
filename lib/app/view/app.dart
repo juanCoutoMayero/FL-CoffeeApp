@@ -1,3 +1,4 @@
+import 'package:coffee_app/app/cubit/theme_cubit.dart';
 import 'package:coffee_app/coffee/view/coffee_page.dart';
 import 'package:coffee_app/l10n/l10n.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,10 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return RepositoryProvider.value(
       value: coffeeRepository,
-      child: const AppView(),
+      child: BlocProvider(
+        create: (_) => ThemeCubit(),
+        child: const AppView(),
+      ),
     );
   }
 }
@@ -27,17 +31,34 @@ class AppView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.brown),
-        appBarTheme: AppBarTheme(
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        ),
-      ),
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: const CoffeePage(),
+    return BlocBuilder<ThemeCubit, ThemeMode>(
+      builder: (context, themeMode) {
+        return MaterialApp(
+          themeMode: themeMode,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.brown,
+            ),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Colors.brown,
+              foregroundColor: Colors.white,
+            ),
+          ),
+          darkTheme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.brown,
+              brightness: Brightness.dark,
+            ),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Colors.brown,
+              foregroundColor: Colors.white,
+            ),
+          ),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const CoffeePage(),
+        );
+      },
     );
   }
 }

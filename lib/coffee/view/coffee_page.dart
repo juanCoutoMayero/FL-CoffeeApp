@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:coffee_app/app/cubit/theme_cubit.dart';
 import 'package:coffee_app/app/theme/app_dimens.dart';
 import 'package:coffee_app/coffee/bloc/bloc.dart';
 import 'package:coffee_app/coffee/widgets/coffee_controls.dart';
@@ -46,7 +47,21 @@ class CoffeeView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.coffeeAppBarTitle),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+
+        actions: [
+          BlocBuilder<ThemeCubit, ThemeMode>(
+            builder: (context, themeMode) {
+              return IconButton(
+                icon: Icon(
+                  themeMode == ThemeMode.dark
+                      ? Icons.light_mode
+                      : Icons.dark_mode,
+                ),
+                onPressed: () => context.read<ThemeCubit>().toggleTheme(),
+              );
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Column(

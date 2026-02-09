@@ -1,5 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:coffee_app/coffee/bloc/bloc.dart';
 import 'package:coffee_app/coffee/view/coffee_page.dart';
 import 'package:coffee_app/coffee/widgets/coffee_controls.dart';
@@ -13,8 +14,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../helpers/helpers.dart';
-
-class MockCoffeeRepository extends Mock implements CoffeeRepository {}
 
 class MockCoffeeBloc extends MockBloc<CoffeeEvent, CoffeeState>
     implements CoffeeBloc {}
@@ -45,6 +44,20 @@ void main() {
       );
 
       expect(find.byType(CoffeeView), findsOneWidget);
+    });
+
+    testWidgets('toggles theme when icon button is pressed', (tester) async {
+      final themeCubit = MockThemeCubit();
+      when(() => themeCubit.state).thenReturn(ThemeMode.light);
+
+      await tester.pumpApp(
+        const CoffeePage(),
+        coffeeRepository: coffeeRepository,
+        themeCubit: themeCubit,
+      );
+
+      await tester.tap(find.byIcon(Icons.dark_mode));
+      verify(() => themeCubit.toggleTheme()).called(1);
     });
   });
 
