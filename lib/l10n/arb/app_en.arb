@@ -27,5 +27,9 @@
     "coffeeSavedSuccessfullyMessage": "Coffee saved successfully!",
     "@coffeeSavedSuccessfullyMessage": {
         "description": "Message shown when coffee is saved successfully"
+    },
+    "somethingWentWrong": "Something went wrong!",
+    "@somethingWentWrong": {
+        "description": "Generic error message"
     }
 }

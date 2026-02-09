@@ -1,3 +1,4 @@
+import 'package:coffee_app/app/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomShimmer extends StatefulWidget {
@@ -48,9 +49,9 @@ class _CustomShimmerState extends State<CustomShimmer>
               begin: Alignment(_animation.value - 1, 0),
               end: Alignment(_animation.value, 0),
               colors: [
-                Colors.grey[300]!,
-                Colors.grey[100]!,
-                Colors.grey[300]!,
+                AppColors.shimmerBase,
+                AppColors.shimmerHighlight,
+                AppColors.shimmerBase,
               ],
               stops: const [0.0, 0.5, 1.0],
             ).createShader(bounds);
