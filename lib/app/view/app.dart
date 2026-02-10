@@ -1,4 +1,5 @@
 import 'package:coffee_app/app/cubit/theme_cubit.dart';
+import 'package:coffee_app/app/theme/app_theme.dart';
 import 'package:coffee_app/coffee/view/coffee_page.dart';
 import 'package:coffee_app/l10n/l10n.dart';
 import 'package:flutter/material.dart';
@@ -44,25 +45,8 @@ class AppView extends StatelessWidget {
       builder: (context, themeMode) {
         return MaterialApp(
           themeMode: themeMode,
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.brown,
-            ),
-            appBarTheme: const AppBarTheme(
-              backgroundColor: Colors.brown,
-              foregroundColor: Colors.white,
-            ),
-          ),
-          darkTheme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.brown,
-              brightness: Brightness.dark,
-            ),
-            appBarTheme: const AppBarTheme(
-              backgroundColor: Colors.brown,
-              foregroundColor: Colors.white,
-            ),
-          ),
+          theme: AppTheme.light(),
+          darkTheme: AppTheme.dark(),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: const CoffeePage(),

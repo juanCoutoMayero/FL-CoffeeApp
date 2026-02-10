@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:coffee_data_sources/coffee_data_sources.dart';
 import 'package:coffee_repository/coffee_repository.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -21,13 +22,14 @@ void main() {
 
     setUpAll(() {
       registerFallbackValue(const CoffeeModel(file: 'file'));
+      registerFallbackValue(const Coffee(file: 'file'));
       registerFallbackValue(Uint8List(0));
     });
 
     setUp(() {
       remoteDataSource = MockCoffeeRemoteDataSource();
       localDataSource = MockCoffeeLocalDataSource();
-      coffeeRepository = CoffeeRepository(
+      coffeeRepository = CoffeeRepositoryImpl(
         remoteDataSource: remoteDataSource,
         localDataSource: localDataSource,
       );
@@ -35,12 +37,24 @@ void main() {
 
     group('getRandomCoffee', () {
       test('calls getRandomCoffee on remoteDataSource', () async {
-        const coffee = CoffeeModel(file: 'file');
+        const coffeeModel = CoffeeModel(file: 'file');
+        const coffee = Coffee(file: 'file');
         when(() => remoteDataSource.getRandomCoffee())
-            .thenAnswer((_) async => coffee);
+            .thenAnswer((_) async => coffeeModel);
 
         expect(await coffeeRepository.getRandomCoffee(), coffee);
         verify(() => remoteDataSource.getRandomCoffee()).called(1);
+      });
+
+      test('throws CoffeeRequestFailure when remoteDataSource throws',
+          () async {
+        final exception = Exception('oops');
+        when(() => remoteDataSource.getRandomCoffee()).thenThrow(exception);
+
+        expect(
+          () => coffeeRepository.getRandomCoffee(),
+          throwsA(isA<CoffeeRequestFailure>()),
+        );
       });
     });
 
@@ -48,13 +62,14 @@ void main() {
       test('downloads image and saves locally', () async {
         const coffee = Coffee(file: 'url');
         final bytes = Uint8List(10);
+        const coffeeModel = CoffeeModel(file: 'url', savedDate: null);
 
         when(() => remoteDataSource.downloadImage(any()))
             .thenAnswer((_) async => bytes);
         when(() => localDataSource.saveFavorite(
               coffee: any(named: 'coffee'),
               imageBytes: any(named: 'imageBytes'),
-            )).thenAnswer((_) async => const CoffeeModel(file: 'url'));
+            )).thenAnswer((_) async => coffeeModel);
 
         await coffeeRepository.saveFavorite(coffee);
 
@@ -63,6 +78,18 @@ void main() {
               coffee: any(named: 'coffee'),
               imageBytes: bytes,
             )).called(1);
+      });
+
+      test('throws CoffeeRequestFailure when remoteDataSource throws',
+          () async {
+        const coffee = Coffee(file: 'url');
+        final exception = Exception('oops');
+        when(() => remoteDataSource.downloadImage(any())).thenThrow(exception);
+
+        expect(
+          () => coffeeRepository.saveFavorite(coffee),
+          throwsA(isA<CoffeeRequestFailure>()),
+        );
       });
     });
 
@@ -79,22 +106,17 @@ void main() {
     });
 
     group('getFavorites', () {
-      test('calls getFavorites on localDataSource and returns sorted list', () {
+      test('calls getFavorites on localDataSource and returns entities', () {
         final date1 = DateTime(2023, 1, 1);
         final date2 = DateTime(2023, 1, 2);
-        final coffee1 = CoffeeModel(file: 'url1', savedDate: date1);
-        final coffee2 = CoffeeModel(file: 'url2', savedDate: date2);
+        final coffeeModel1 = CoffeeModel(file: 'url1', savedDate: date1);
+        final coffeeModel2 = CoffeeModel(file: 'url2', savedDate: date2);
+
+        final coffee1 = Coffee(file: 'url1', savedDate: date1);
+        final coffee2 = Coffee(file: 'url2', savedDate: date2);
 
         when(() => localDataSource.getFavorites())
-            .thenReturn([coffee1, coffee2]);
-
-        // The repository just forwards the call.
-        // The sorting logic now resides in LocalDataSource.getFavorites()
-        // but since we are mocking LocalDataSource here, we can only verify forwarding.
-        // However, if we want to test REPOSITORY, it just returns strict list.
-        // The sorting is implemented in LOCAL DATA SOURCE.
-        // So this test file tests REPOSITORY component.
-        // Verify repository returns what datasource returns.
+            .thenReturn([coffeeModel1, coffeeModel2]);
 
         expect(coffeeRepository.getFavorites(), [coffee1, coffee2]);
         verify(() => localDataSource.getFavorites()).called(1);

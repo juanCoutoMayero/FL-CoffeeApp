@@ -12,6 +12,7 @@ class FavoritesList extends StatelessWidget {
   Widget build(BuildContext context) {
     // We assume CoffeeBloc is provided above
     return BlocBuilder<CoffeeBloc, CoffeeState>(
+      buildWhen: (previous, current) => previous.favorites != current.favorites,
       builder: (context, state) {
         if (state.favorites.isEmpty) {
           // Empty State

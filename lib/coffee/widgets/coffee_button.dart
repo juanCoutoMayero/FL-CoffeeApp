@@ -1,3 +1,4 @@
+import 'package:coffee_app/app/theme/app_dimens.dart';
 import 'package:flutter/material.dart';
 
 class CoffeeButton extends StatelessWidget {
@@ -16,9 +17,12 @@ class CoffeeButton extends StatelessWidget {
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimens.buttonBorderRadius),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimens.buttonPaddingHorizontal,
+          vertical: AppDimens.buttonPaddingVertical,
+        ),
       ),
       child: child,
     );

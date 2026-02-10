@@ -1,5 +1,4 @@
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:flutter/foundation.dart';
 import 'package:monitoring_repository/src/crashlytics_service.dart';
 
 /// {@template firebase_crashlytics_service}

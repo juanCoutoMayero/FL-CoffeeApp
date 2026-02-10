@@ -59,7 +59,7 @@ MockThemeCubit _buildMockThemeCubit() {
 MockAnalyticsService _buildMockAnalyticsService() {
   final service = MockAnalyticsService();
   when(
-    () => service.logEvent(name: any(named: 'name')),
+    () => service.logEvent(name: any<String>(named: 'name')),
   ).thenAnswer((_) async {});
   return service;
 }

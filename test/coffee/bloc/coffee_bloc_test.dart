@@ -27,7 +27,7 @@ void main() {
       crashlyticsService = MockCrashlyticsService();
 
       when(
-        () => analyticsService.logEvent(name: any(named: 'name')),
+        () => analyticsService.logEvent(name: any<String>(named: 'name')),
       ).thenAnswer((_) async {});
       when(
         () => crashlyticsService.recordError(any(), any()),
@@ -114,7 +114,9 @@ void main() {
     blocTest<CoffeeBloc, CoffeeState>(
       'emits [loading, failure] when fetch requested fails',
       setUp: () {
-        when(() => coffeeRepository.getRandomCoffee()).thenThrow(Exception());
+        when(
+          () => coffeeRepository.getRandomCoffee(),
+        ).thenThrow(const CoffeeRequestFailure('oops', StackTrace.empty));
       },
       build: () => CoffeeBloc(
         coffeeRepository: coffeeRepository,
@@ -124,7 +126,10 @@ void main() {
       act: (bloc) => bloc.add(const CoffeeFetchRequested()),
       expect: () => [
         const CoffeeState(status: CoffeeStatus.loading),
-        const CoffeeState(status: CoffeeStatus.failure),
+        const CoffeeState(
+          status: CoffeeStatus.failure,
+          failure: CoffeeRequestFailure('oops', StackTrace.empty),
+        ),
       ],
     );
 
@@ -153,6 +158,27 @@ void main() {
           () => coffeeRepository.saveFavorite(const Coffee(file: 'url')),
         ).called(1);
       },
+    );
+
+    blocTest<CoffeeBloc, CoffeeState>(
+      'emits failure when saveFavorite fails',
+      setUp: () {
+        when(() => coffeeRepository.isFavorite(any())).thenReturn(false);
+        when(
+          () => coffeeRepository.saveFavorite(any()),
+        ).thenThrow(const CoffeeRequestFailure('oops', StackTrace.empty));
+      },
+      build: () => CoffeeBloc(
+        coffeeRepository: coffeeRepository,
+        analyticsService: analyticsService,
+        crashlyticsService: crashlyticsService,
+      ),
+      act: (bloc) => bloc.add(const CoffeeFavoriteToggled(Coffee(file: 'url'))),
+      expect: () => [
+        const CoffeeState(
+          failure: CoffeeRequestFailure('oops', StackTrace.empty),
+        ),
+      ],
     );
 
     blocTest<CoffeeBloc, CoffeeState>(

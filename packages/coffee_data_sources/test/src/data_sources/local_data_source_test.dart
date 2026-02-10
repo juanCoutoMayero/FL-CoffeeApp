@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:coffee_repository/coffee_repository.dart';
+import 'package:coffee_data_sources/coffee_data_sources.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
@@ -28,38 +28,39 @@ void main() {
 
     group('getFavorites', () {
       test(
-          'returns favorites sorted by savedDate descending with reconstructed paths',
-          () {
-        final date1 = DateTime(2023, 1, 1);
-        final date2 = DateTime(2023, 1, 2);
-        final date3 = DateTime(2023, 1, 3);
+        'returns favorites sorted by savedDate descending with reconstructed paths',
+        () {
+          final date1 = DateTime(2023, 1, 1);
+          final date2 = DateTime(2023, 1, 2);
+          final date3 = DateTime(2023, 1, 3);
 
-        final coffee1 = CoffeeModel(
-          file: 'url1',
-          savedDate: date1,
-          localPath: 'image1.jpg',
-        );
-        final coffee2 = CoffeeModel(
-          file: 'url2',
-          savedDate: date2,
-          localPath: 'image2.jpg',
-        );
-        final coffee3 = CoffeeModel(
-          file: 'url3',
-          savedDate: date3,
-          localPath: '/old/absolute/path/image3.jpg',
-        );
+          final coffee1 = CoffeeModel(
+            file: 'url1',
+            savedDate: date1,
+            localPath: 'image1.jpg',
+          );
+          final coffee2 = CoffeeModel(
+            file: 'url2',
+            savedDate: date2,
+            localPath: 'image2.jpg',
+          );
+          final coffee3 = CoffeeModel(
+            file: 'url3',
+            savedDate: date3,
+            localPath: '/old/absolute/path/image3.jpg',
+          );
 
-        when(() => coffeeBox.values).thenReturn([coffee1, coffee3, coffee2]);
+          when(() => coffeeBox.values).thenReturn([coffee1, coffee3, coffee2]);
 
-        final favorites = localDataSource.getFavorites();
+          final favorites = localDataSource.getFavorites();
 
-        expect(favorites.length, 3);
-        expect(favorites[0].localPath, '/tmp/image3.jpg');
-        expect(favorites[1].localPath, '/tmp/image2.jpg');
-        expect(favorites[2].localPath, '/tmp/image1.jpg');
-        expect(favorites[0].savedDate, date3);
-      });
+          expect(favorites.length, 3);
+          expect(favorites[0].localPath, '/tmp/image3.jpg');
+          expect(favorites[1].localPath, '/tmp/image2.jpg');
+          expect(favorites[2].localPath, '/tmp/image1.jpg');
+          expect(favorites[0].savedDate, date3);
+        },
+      );
 
       test('handles null savedDate (treats as oldest)', () {
         final date1 = DateTime(2023, 1, 1);
@@ -70,10 +71,7 @@ void main() {
 
         final favorites = localDataSource.getFavorites();
 
-        expect(favorites, [
-          coffee1,
-          coffee2,
-        ]);
+        expect(favorites, [coffee1, coffee2]);
       });
     });
 
@@ -99,7 +97,9 @@ void main() {
           file.deleteSync();
         }
 
-        when(() => coffeeBox.put(any(), any())).thenAnswer((_) async {});
+        when(
+          () => coffeeBox.put(any(), any<CoffeeModel>()),
+        ).thenAnswer((_) async {});
 
         final savedCoffee = await localDataSource.saveFavorite(
           coffee: coffee,
@@ -111,8 +111,9 @@ void main() {
         expect(file.existsSync(), isTrue);
 
         // Expect Hive to receive relative path (filename)
-        final captured =
-            verify(() => coffeeBox.put('image.jpg', captureAny())).captured;
+        final captured = verify(
+          () => coffeeBox.put('image.jpg', captureAny()),
+        ).captured;
         final savedToBox = captured.first as CoffeeModel;
         expect(savedToBox.localPath, 'image.jpg');
 
@@ -149,20 +150,22 @@ void main() {
 
     group('isFavorite', () {
       test('returns true when coffee is in box', () {
-        when(() => coffeeBox.containsKey(any())).thenReturn(true);
+        when(() => coffeeBox.containsKey(any<String>())).thenReturn(true);
 
-        final isFav =
-            localDataSource.isFavorite('https://example.com/image.jpg');
+        final isFav = localDataSource.isFavorite(
+          'https://example.com/image.jpg',
+        );
 
         expect(isFav, isTrue);
         verify(() => coffeeBox.containsKey('image.jpg')).called(1);
       });
 
       test('returns false when coffee is not in box', () {
-        when(() => coffeeBox.containsKey(any())).thenReturn(false);
+        when(() => coffeeBox.containsKey(any<String>())).thenReturn(false);
 
-        final isFav =
-            localDataSource.isFavorite('https://example.com/image.jpg');
+        final isFav = localDataSource.isFavorite(
+          'https://example.com/image.jpg',
+        );
 
         expect(isFav, isFalse);
         verify(() => coffeeBox.containsKey('image.jpg')).called(1);
