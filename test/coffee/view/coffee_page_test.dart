@@ -4,7 +4,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:coffee_app/coffee/bloc/bloc.dart';
 import 'package:coffee_app/coffee/view/coffee_page.dart';
 import 'package:coffee_app/coffee/widgets/coffee_controls.dart';
-import 'package:coffee_app/coffee/widgets/custom_shimmer.dart';
+import 'package:coffee_app/coffee/widgets/coffee_error_view.dart';
+import 'package:coffee_app/coffee/widgets/coffee_image.dart';
+import 'package:coffee_app/coffee/widgets/coffee_image_placeholder.dart';
 import 'package:coffee_app/coffee/widgets/favorite_item.dart';
 import 'package:coffee_app/coffee/widgets/favorites_list.dart';
 import 'package:coffee_repository/coffee_repository.dart';
@@ -92,7 +94,9 @@ void main() {
       coffeeBloc = MockCoffeeBloc();
     });
 
-    testWidgets('renders CustomShimmer when status is loading', (tester) async {
+    testWidgets('renders CoffeeImagePlaceholder when status is loading', (
+      tester,
+    ) async {
       when(() => coffeeBloc.state).thenReturn(
         const CoffeeState(status: CoffeeStatus.loading),
       );
@@ -104,10 +108,10 @@ void main() {
         ),
       );
 
-      expect(find.byType(CustomShimmer), findsOneWidget);
+      expect(find.byType(CoffeeImagePlaceholder), findsOneWidget);
     });
 
-    testWidgets('renders CachedNetworkImage when status is success', (
+    testWidgets('renders CoffeeImage when status is success', (
       tester,
     ) async {
       when(() => coffeeBloc.state).thenReturn(
@@ -124,10 +128,12 @@ void main() {
         ),
       );
 
-      expect(find.byType(CachedNetworkImage), findsOneWidget);
+      expect(find.byType(CoffeeImage), findsOneWidget);
     });
 
-    testWidgets('renders error text when status is failure', (tester) async {
+    testWidgets('renders CoffeeErrorView when status is failure', (
+      tester,
+    ) async {
       when(() => coffeeBloc.state).thenReturn(
         const CoffeeState(status: CoffeeStatus.failure),
       );
@@ -139,7 +145,7 @@ void main() {
         ),
       );
 
-      expect(find.text('Something went wrong!'), findsOneWidget);
+      expect(find.byType(CoffeeErrorView), findsOneWidget);
     });
   });
 

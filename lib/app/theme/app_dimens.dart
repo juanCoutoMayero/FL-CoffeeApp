@@ -9,4 +9,9 @@ class AppDimens {
   static const double coffeeImageHeight = 400;
   static const double favoritesListHeight = 120;
   static const double favoriteThumbnailSize = 80;
+
+  // Button dimensions
+  static const double buttonBorderRadius = 16;
+  static const double buttonPaddingHorizontal = 24;
+  static const double buttonPaddingVertical = 12;
 }

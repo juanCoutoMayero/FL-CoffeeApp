@@ -1,9 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:coffee_app/app/cubit/theme_cubit.dart';
 import 'package:coffee_app/app/theme/app_dimens.dart';
+import 'package:coffee_app/app/widgets/theme_toggle_button.dart';
 import 'package:coffee_app/coffee/bloc/bloc.dart';
 import 'package:coffee_app/coffee/widgets/coffee_controls.dart';
-import 'package:coffee_app/coffee/widgets/custom_shimmer.dart';
+import 'package:coffee_app/coffee/widgets/coffee_error_view.dart';
+import 'package:coffee_app/coffee/widgets/coffee_image.dart';
+import 'package:coffee_app/coffee/widgets/coffee_image_placeholder.dart';
 import 'package:coffee_app/coffee/widgets/favorites_list.dart';
 import 'package:coffee_app/l10n/l10n.dart';
 
@@ -50,20 +51,8 @@ class CoffeeView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.coffeeAppBarTitle),
-
-        actions: [
-          BlocBuilder<ThemeCubit, ThemeMode>(
-            builder: (context, themeMode) {
-              return IconButton(
-                icon: Icon(
-                  themeMode == ThemeMode.dark
-                      ? Icons.light_mode
-                      : Icons.dark_mode,
-                ),
-                onPressed: () => context.read<ThemeCubit>().toggleTheme(),
-              );
-            },
-          ),
+        actions: const [
+          ThemeToggleButton(),
         ],
       ),
       body: const Center(
@@ -97,52 +86,12 @@ class CoffeeDisplay extends StatelessWidget {
           previous.coffee != current.coffee,
       builder: (context, state) {
         if (state.status == CoffeeStatus.loading) {
-          return CustomShimmer(
-            child: Container(
-              height: AppDimens.coffeeImageHeight,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(AppDimens.paddingLarge),
-              ),
-            ),
-          );
+          return const CoffeeImagePlaceholder();
         } else if (state.status == CoffeeStatus.success &&
             state.coffee != null) {
-          return CachedNetworkImage(
-            imageUrl: state.coffee!.file,
-            imageBuilder: (context, imageProvider) => Container(
-              constraints: const BoxConstraints(
-                maxHeight: AppDimens.coffeeImageHeight,
-              ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(AppDimens.paddingLarge),
-                image: DecorationImage(
-                  image: imageProvider,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            placeholder: (context, url) => CustomShimmer(
-              child: Container(
-                height: AppDimens.coffeeImageHeight,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(AppDimens.paddingLarge),
-                ),
-              ),
-            ),
-            errorWidget: (context, url, error) => Center(
-              child: Text(context.l10n.somethingWentWrong),
-            ),
-          );
+          return CoffeeImage(imageUrl: state.coffee!.file);
         } else if (state.status == CoffeeStatus.failure) {
-          final failure = state.failure;
-          final message = failure != null
-              ? context.l10n.somethingWentWrong
-              : context.l10n.somethingWentWrong;
-          return Center(child: Text(message));
+          return const CoffeeErrorView();
         } else {
           return const SizedBox.shrink();
         }
