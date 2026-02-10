@@ -14,6 +14,16 @@ A Flutter application for browsing and saving coffee images, built with a clean,
 *   **Internationalization**: Full support for English (`en`) and Spanish (`es`) locales.
 *   **Offline First**: Cached images and local storage ensure functionality even without an internet connection.
 
+## Analytics & Reliability 🛡️
+
+This project leverages modern tools to ensure a stable and data-driven experience:
+
+*   **Firebase Analytics**: Tracks specific events to understand user experience and engagement.
+*   **Shorebird Integration**:
+    *   **Instant Patches**: Deploy updates and fixes without app store delays.
+    *   **Reliability**: Designed to deploy fixes in minutes.
+    *   **Rollback**: Revert any update with a click of a button.
+
 ## Architecture 🏗️
 
 This project follows a **Feature-First & Layered Architecture** to ensure scalability, testability, and maintainability.
