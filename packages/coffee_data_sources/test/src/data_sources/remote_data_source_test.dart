@@ -1,29 +1,24 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:coffee_api_client/coffee_api_client.dart';
 import 'package:coffee_data_sources/coffee_data_sources.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mocktail/mocktail.dart';
 
-class MockHttpClient extends Mock implements http.Client {}
+class MockCoffeeApiClient extends Mock implements CoffeeApiClient {}
 
 class MockResponse extends Mock implements http.Response {}
 
-class FakeUri extends Fake implements Uri {}
-
 void main() {
   group('CoffeeRemoteDataSource', () {
-    late http.Client httpClient;
+    late CoffeeApiClient apiClient;
     late CoffeeRemoteDataSource remoteDataSource;
 
-    setUpAll(() {
-      registerFallbackValue(FakeUri());
-    });
-
     setUp(() {
-      httpClient = MockHttpClient();
-      remoteDataSource = CoffeeRemoteDataSource(client: httpClient);
+      apiClient = MockCoffeeApiClient();
+      remoteDataSource = CoffeeRemoteDataSource(client: apiClient);
     });
 
     group('getRandomCoffee', () {
@@ -33,7 +28,7 @@ void main() {
         when(() => response.body).thenReturn(
           jsonEncode({'file': 'https://coffee.alexflipnote.dev/random.json'}),
         );
-        when(() => httpClient.get(any())).thenAnswer((_) async => response);
+        when(() => apiClient.get(any())).thenAnswer((_) async => response);
 
         final coffee = await remoteDataSource.getRandomCoffee();
 
@@ -50,7 +45,7 @@ void main() {
       test('throws Exception when response is not 200', () async {
         final response = MockResponse();
         when(() => response.statusCode).thenReturn(404);
-        when(() => httpClient.get(any())).thenAnswer((_) async => response);
+        when(() => apiClient.get(any())).thenAnswer((_) async => response);
 
         expect(
           () => remoteDataSource.getRandomCoffee(),
@@ -66,7 +61,7 @@ void main() {
         when(
           () => response.bodyBytes,
         ).thenReturn(Uint8List.fromList([0, 1, 2]));
-        when(() => httpClient.get(any())).thenAnswer((_) async => response);
+        when(() => apiClient.get(any())).thenAnswer((_) async => response);
 
         final bytes = await remoteDataSource.downloadImage(
           'https://example.com/image.jpg',
@@ -78,7 +73,7 @@ void main() {
       test('throws Exception when response is not 200', () async {
         final response = MockResponse();
         when(() => response.statusCode).thenReturn(404);
-        when(() => httpClient.get(any())).thenAnswer((_) async => response);
+        when(() => apiClient.get(any())).thenAnswer((_) async => response);
 
         expect(
           () => remoteDataSource.downloadImage('https://example.com/image.jpg'),

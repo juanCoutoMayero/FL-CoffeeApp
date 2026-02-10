@@ -26,6 +26,8 @@ dependencies:
   intl: ^0.20.2
   bloc_concurrency: ^0.3.0
   cached_network_image: ^3.4.1
+  coffee_api_client:
+    path: packages/coffee_api_client
 
 dev_dependencies:
   bloc_lint: ">=0.3.3 <0.3.6"

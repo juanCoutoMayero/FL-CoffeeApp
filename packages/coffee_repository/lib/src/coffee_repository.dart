@@ -5,12 +5,18 @@ import 'package:coffee_repository/src/models/models.dart';
 /// {@endtemplate}
 abstract class CoffeeRepository {
   /// Fetches a random coffee.
+  ///
+  /// Throws [CoffeeRequestFailure] if the request fails.
   Future<Coffee> getRandomCoffee();
 
   /// Downloads and saves a coffee as favorite.
+  ///
+  /// Throws [CoffeeRequestFailure] if the download or save operation fails.
   Future<void> saveFavorite(Coffee coffee);
 
   /// Removes a coffee from favorites.
+  ///
+  /// Throws [CoffeeRequestFailure] if the removal operation fails.
   Future<void> removeFavorite(Coffee coffee);
 
   /// Returns a stream of favorites.

@@ -10,11 +10,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  http: ^1.1.0
   hive: ^2.2.3
   path_provider: ^2.1.1
   equatable: ^2.0.5
   json_annotation: ^4.8.1
+  coffee_api_client:
+    path: ../coffee_api_client
 
 dev_dependencies:
   flutter_test:

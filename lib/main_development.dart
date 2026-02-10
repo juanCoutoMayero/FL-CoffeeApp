@@ -1,6 +1,6 @@
 import 'package:coffee_app/app/app.dart';
 import 'package:coffee_app/bootstrap.dart';
-
+import 'package:coffee_api_client/coffee_api_client.dart';
 import 'package:coffee_data_sources/coffee_data_sources.dart';
 import 'package:coffee_repository/coffee_repository.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -32,7 +32,11 @@ Future<void> main() async {
     storagePath: directory.path,
   );
 
-  final remoteDataSource = CoffeeRemoteDataSource();
+  final apiClient = CoffeeApiClient(
+    baseUrl: 'https://coffee.alexflipnote.dev',
+  );
+
+  final remoteDataSource = CoffeeRemoteDataSource(client: apiClient);
 
   final coffeeRepository = CoffeeRepositoryImpl(
     remoteDataSource: remoteDataSource,
