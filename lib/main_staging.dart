@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:monitoring_repository/monitoring_repository.dart';
+import 'package:path_provider/path_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,9 +19,14 @@ Future<void> main() async {
   Hive.registerAdapter(CoffeeModelAdapter());
   final coffeeBox = await Hive.openBox<CoffeeModel>('coffee_box');
 
+  final directory = await getApplicationDocumentsDirectory();
+
   final coffeeRepository = CoffeeRepository(
     remoteDataSource: CoffeeRemoteDataSource(),
-    localDataSource: CoffeeLocalDataSource(coffeeBox: coffeeBox),
+    localDataSource: CoffeeLocalDataSource(
+      coffeeBox: coffeeBox,
+      storagePath: directory.path,
+    ),
   );
 
   await bootstrap(

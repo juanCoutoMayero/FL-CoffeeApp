@@ -44,4 +44,17 @@ class CoffeeModel extends Coffee {
       savedDate: coffee.savedDate,
     );
   }
+
+  /// Creates a copy of [CoffeeModel] with updated fields.
+  CoffeeModel copyWith({
+    String? file,
+    String? localPath,
+    DateTime? savedDate,
+  }) {
+    return CoffeeModel(
+      file: file ?? this.file,
+      localPath: localPath ?? this.localPath,
+      savedDate: savedDate ?? this.savedDate,
+    );
+  }
 }
