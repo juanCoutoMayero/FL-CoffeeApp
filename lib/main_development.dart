@@ -1,6 +1,7 @@
 import 'package:coffee_app/app/app.dart';
 import 'package:coffee_app/bootstrap.dart';
 
+import 'package:coffee_data_sources/coffee_data_sources.dart';
 import 'package:coffee_repository/coffee_repository.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/widgets.dart';
@@ -21,16 +22,21 @@ Future<void> main() async {
   final crashlyticsService = FirebaseCrashlyticsService();
 
   Hive.registerAdapter(CoffeeModelAdapter());
+  // Open box with type CoffeeModel
   final coffeeBox = await Hive.openBox<CoffeeModel>('coffee_box');
 
   final directory = await getApplicationDocumentsDirectory();
 
-  final coffeeRepository = CoffeeRepository(
-    remoteDataSource: CoffeeRemoteDataSource(),
-    localDataSource: CoffeeLocalDataSource(
-      coffeeBox: coffeeBox,
-      storagePath: directory.path,
-    ),
+  final localDataSource = CoffeeLocalDataSource(
+    coffeeBox: coffeeBox,
+    storagePath: directory.path,
+  );
+
+  final remoteDataSource = CoffeeRemoteDataSource();
+
+  final coffeeRepository = CoffeeRepositoryImpl(
+    remoteDataSource: remoteDataSource,
+    localDataSource: localDataSource,
   );
 
   await bootstrap(

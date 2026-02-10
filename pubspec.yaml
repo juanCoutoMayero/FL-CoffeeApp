@@ -12,6 +12,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1
+  coffee_data_sources:
+    path: packages/coffee_data_sources
   coffee_repository:
     path: packages/coffee_repository
   monitoring_repository:

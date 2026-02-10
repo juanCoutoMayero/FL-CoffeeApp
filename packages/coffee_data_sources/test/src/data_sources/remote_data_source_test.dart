@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:coffee_repository/coffee_repository.dart';
+import 'package:coffee_data_sources/coffee_data_sources.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mocktail/mocktail.dart';
@@ -39,8 +39,11 @@ void main() {
 
         expect(
           coffee,
-          isA<CoffeeModel>().having((c) => c.file, 'file',
-              'https://coffee.alexflipnote.dev/random.json'),
+          isA<CoffeeModel>().having(
+            (c) => c.file,
+            'file',
+            'https://coffee.alexflipnote.dev/random.json',
+          ),
         );
       });
 
@@ -60,12 +63,14 @@ void main() {
       test('returns Uint8List when response is 200', () async {
         final response = MockResponse();
         when(() => response.statusCode).thenReturn(200);
-        when(() => response.bodyBytes)
-            .thenReturn(Uint8List.fromList([0, 1, 2]));
+        when(
+          () => response.bodyBytes,
+        ).thenReturn(Uint8List.fromList([0, 1, 2]));
         when(() => httpClient.get(any())).thenAnswer((_) async => response);
 
-        final bytes = await remoteDataSource
-            .downloadImage('https://example.com/image.jpg');
+        final bytes = await remoteDataSource.downloadImage(
+          'https://example.com/image.jpg',
+        );
 
         expect(bytes, equals([0, 1, 2]));
       });

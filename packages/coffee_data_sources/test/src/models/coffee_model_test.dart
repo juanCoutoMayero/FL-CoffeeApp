@@ -1,4 +1,4 @@
-import 'package:coffee_repository/coffee_repository.dart';
+import 'package:coffee_data_sources/coffee_data_sources.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -48,20 +48,6 @@ void main() {
       expect(json['file'], equals(file));
       expect(json['localPath'], equals(localPath));
       expect(json['savedDate'], equals(savedDate.toIso8601String()));
-    });
-
-    test('fromEntity returns correct CoffeeModel', () {
-      final coffee = Coffee(
-        file: file,
-        localPath: localPath,
-        savedDate: savedDate,
-      );
-
-      final coffeeModel = CoffeeModel.fromEntity(coffee);
-
-      expect(coffeeModel.file, equals(file));
-      expect(coffeeModel.localPath, equals(localPath));
-      expect(coffeeModel.savedDate, equals(savedDate));
     });
   });
 }

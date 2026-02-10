@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:coffee_repository/src/models/models.dart';
+import 'package:coffee_data_sources/src/models/coffee_model.dart';
 import 'package:hive/hive.dart';
 
 /// {@template coffee_local_data_source}
@@ -12,28 +12,28 @@ class CoffeeLocalDataSource {
   const CoffeeLocalDataSource({
     required Box<CoffeeModel> coffeeBox,
     required String storagePath,
-  })  : _coffeeBox = coffeeBox,
-        _storagePath = storagePath;
+  }) : _coffeeBox = coffeeBox,
+       _storagePath = storagePath;
 
   final Box<CoffeeModel> _coffeeBox;
   final String _storagePath;
 
   /// Returns a stream of [CoffeeModel]s.
   List<CoffeeModel> getFavorites() {
-    final favorites = _coffeeBox.values.map((coffee) {
-      // reconstruct absolute path
-      if (coffee.localPath != null) {
-        final fileName = Uri.parse(coffee.localPath!).pathSegments.last;
-        return coffee.copyWith(localPath: '$_storagePath/$fileName');
-      }
-      return coffee;
-    }).toList()
-      ..sort((a, b) {
-        if (a.savedDate == null && b.savedDate == null) return 0;
-        if (a.savedDate == null) return 1;
-        if (b.savedDate == null) return -1;
-        return b.savedDate!.compareTo(a.savedDate!);
-      });
+    final favorites =
+        _coffeeBox.values.map((coffee) {
+          // reconstruct absolute path
+          if (coffee.localPath != null) {
+            final fileName = Uri.parse(coffee.localPath!).pathSegments.last;
+            return coffee.copyWith(localPath: '$_storagePath/$fileName');
+          }
+          return coffee;
+        }).toList()..sort((a, b) {
+          if (a.savedDate == null && b.savedDate == null) return 0;
+          if (a.savedDate == null) return 1;
+          if (b.savedDate == null) return -1;
+          return b.savedDate!.compareTo(a.savedDate!);
+        });
     return favorites;
   }
 
