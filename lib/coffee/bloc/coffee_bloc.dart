@@ -6,7 +6,11 @@ import 'package:coffee_app/coffee/bloc/coffee_state.dart';
 import 'package:coffee_repository/coffee_repository.dart';
 import 'package:monitoring_repository/monitoring_repository.dart';
 
+/// {@template coffee_bloc}
+/// A Bloc that handles coffee related events.
+/// {@endtemplate}
 class CoffeeBloc extends Bloc<CoffeeEvent, CoffeeState> {
+  /// {@macro coffee_bloc}
   CoffeeBloc({
     required CoffeeRepository coffeeRepository,
     required AnalyticsService analyticsService,
@@ -78,8 +82,24 @@ class CoffeeBloc extends Bloc<CoffeeEvent, CoffeeState> {
         ),
       );
       await _analyticsService.logEvent(name: 'request_new_coffee');
+    } on CoffeeFailure catch (failure) {
+      emit(
+        state.copyWith(
+          status: CoffeeStatus.failure,
+          failure: failure,
+        ),
+      );
+      await _crashlyticsService.recordError(
+        failure.error,
+        failure.stackTrace,
+      );
     } catch (error, stackTrace) {
-      emit(state.copyWith(status: CoffeeStatus.failure));
+      emit(
+        state.copyWith(
+          status: CoffeeStatus.failure,
+          failure: CoffeeRequestFailure(error, stackTrace),
+        ),
+      );
       await _crashlyticsService.recordError(error, stackTrace);
     }
   }
@@ -104,8 +124,18 @@ class CoffeeBloc extends Bloc<CoffeeEvent, CoffeeState> {
         );
         await _analyticsService.logEvent(name: 'add_favorite');
       }
+    } on CoffeeFailure catch (failure) {
+      emit(state.copyWith(failure: failure));
+      await _crashlyticsService.recordError(
+        failure.error,
+        failure.stackTrace,
+      );
     } catch (error, stackTrace) {
-      // Handle error saving favorite
+      emit(
+        state.copyWith(
+          failure: CoffeeRequestFailure(error, stackTrace),
+        ),
+      );
       await _crashlyticsService.recordError(error, stackTrace);
     }
   }

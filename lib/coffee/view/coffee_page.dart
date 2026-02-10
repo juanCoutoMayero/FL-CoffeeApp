@@ -138,7 +138,11 @@ class CoffeeDisplay extends StatelessWidget {
             ),
           );
         } else if (state.status == CoffeeStatus.failure) {
-          return Text(context.l10n.somethingWentWrong);
+          final failure = state.failure;
+          final message = failure != null
+              ? context.l10n.somethingWentWrong
+              : context.l10n.somethingWentWrong;
+          return Center(child: Text(message));
         } else {
           return const SizedBox.shrink();
         }

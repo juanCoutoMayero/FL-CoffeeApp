@@ -99,7 +99,8 @@ void main() {
           file.deleteSync();
         }
 
-        when(() => coffeeBox.put(any(), any())).thenAnswer((_) async {});
+        when(() => coffeeBox.put(any(), any<CoffeeModel>()))
+            .thenAnswer((_) async {});
 
         final savedCoffee = await localDataSource.saveFavorite(
           coffee: coffee,
@@ -149,7 +150,7 @@ void main() {
 
     group('isFavorite', () {
       test('returns true when coffee is in box', () {
-        when(() => coffeeBox.containsKey(any())).thenReturn(true);
+        when(() => coffeeBox.containsKey(any<String>())).thenReturn(true);
 
         final isFav =
             localDataSource.isFavorite('https://example.com/image.jpg');
@@ -159,7 +160,7 @@ void main() {
       });
 
       test('returns false when coffee is not in box', () {
-        when(() => coffeeBox.containsKey(any())).thenReturn(false);
+        when(() => coffeeBox.containsKey(any<String>())).thenReturn(false);
 
         final isFav =
             localDataSource.isFavorite('https://example.com/image.jpg');

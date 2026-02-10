@@ -42,6 +42,17 @@ void main() {
         expect(await coffeeRepository.getRandomCoffee(), coffee);
         verify(() => remoteDataSource.getRandomCoffee()).called(1);
       });
+
+      test('throws CoffeeRequestFailure when remoteDataSource throws',
+          () async {
+        final exception = Exception('oops');
+        when(() => remoteDataSource.getRandomCoffee()).thenThrow(exception);
+
+        expect(
+          () => coffeeRepository.getRandomCoffee(),
+          throwsA(isA<CoffeeRequestFailure>()),
+        );
+      });
     });
 
     group('saveFavorite', () {
@@ -63,6 +74,18 @@ void main() {
               coffee: any(named: 'coffee'),
               imageBytes: bytes,
             )).called(1);
+      });
+
+      test('throws CoffeeRequestFailure when remoteDataSource throws',
+          () async {
+        const coffee = Coffee(file: 'url');
+        final exception = Exception('oops');
+        when(() => remoteDataSource.downloadImage(any())).thenThrow(exception);
+
+        expect(
+          () => coffeeRepository.saveFavorite(coffee),
+          throwsA(isA<CoffeeRequestFailure>()),
+        );
       });
     });
 

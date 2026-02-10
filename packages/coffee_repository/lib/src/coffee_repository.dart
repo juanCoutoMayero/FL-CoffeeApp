@@ -21,23 +21,35 @@ class CoffeeRepository {
 
   /// Fetches a random coffee.
   Future<Coffee> getRandomCoffee() async {
-    return _remoteDataSource.getRandomCoffee();
+    try {
+      return await _remoteDataSource.getRandomCoffee();
+    } catch (error, stackTrace) {
+      throw CoffeeRequestFailure(error, stackTrace);
+    }
   }
 
   /// Downloads and saves a coffee as favorite.
   Future<void> saveFavorite(Coffee coffee) async {
-    final imageBytes = await _remoteDataSource.downloadImage(coffee.file);
-    final coffeeModel = CoffeeModel.fromEntity(coffee);
-    await _localDataSource.saveFavorite(
-      coffee: coffeeModel,
-      imageBytes: imageBytes,
-    );
+    try {
+      final imageBytes = await _remoteDataSource.downloadImage(coffee.file);
+      final coffeeModel = CoffeeModel.fromEntity(coffee);
+      await _localDataSource.saveFavorite(
+        coffee: coffeeModel,
+        imageBytes: imageBytes,
+      );
+    } catch (error, stackTrace) {
+      throw CoffeeRequestFailure(error, stackTrace);
+    }
   }
 
   /// Removes a coffee from favorites.
   Future<void> removeFavorite(Coffee coffee) async {
-    final coffeeModel = CoffeeModel.fromEntity(coffee);
-    await _localDataSource.removeFavorite(coffeeModel);
+    try {
+      final coffeeModel = CoffeeModel.fromEntity(coffee);
+      await _localDataSource.removeFavorite(coffeeModel);
+    } catch (error, stackTrace) {
+      throw CoffeeRequestFailure(error, stackTrace);
+    }
   }
 
   /// items.

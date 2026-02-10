@@ -16,9 +16,9 @@ class CoffeeRemoteDataSource {
 
   /// Fetches a random coffee image URL.
   Future<CoffeeModel> getRandomCoffee() async {
-    final response = await _client.get(
-      Uri.parse('https://coffee.alexflipnote.dev/random.json'),
-    );
+    final response = await _client
+        .get(Uri.parse('https://coffee.alexflipnote.dev/random.json'))
+        .timeout(const Duration(seconds: 15));
 
     if (response.statusCode != 200) {
       throw Exception('Failed to fetch random coffee');
@@ -30,7 +30,8 @@ class CoffeeRemoteDataSource {
 
   /// Downloads the image from the given [url].
   Future<Uint8List> downloadImage(String url) async {
-    final response = await _client.get(Uri.parse(url));
+    final response =
+        await _client.get(Uri.parse(url)).timeout(const Duration(seconds: 15));
 
     if (response.statusCode != 200) {
       throw Exception('Failed to download image');
